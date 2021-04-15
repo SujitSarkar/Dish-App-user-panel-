@@ -102,7 +102,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     SizedBox(height: 30),
                     _textField('মোবাইল নাম্বার',
                         'assets/field-icon/icon_phone.png', size,pProvider),
-                    _textField('পাসয়ার্ড',
+                    _textField('পাসওয়ার্ড',
                         "assets/field-icon/icon_password.png", size,pProvider),
                     _textField('এন আইডি নাম্বার',
                         "assets/field-icon/icon_pad.png", size,pProvider),
@@ -174,15 +174,15 @@ class _SignUpPageState extends State<SignUpPage> {
         child: TextField(
             keyboardType:
             hint == 'মোবাইল নাম্বার' || hint == 'এন আইডি নাম্বার'
-                ? TextInputType.number
+                ? TextInputType.phone
                 : TextInputType.text,
-            obscureText:hint == 'পাসয়ার্ড'? _isObscure ? true : false:false,
+            obscureText:hint == 'পাসওয়ার্ড'? _isObscure ? true : false:false,
             style: Design.subTitleStyle(size).copyWith(
               color: CustomColors.textColor,
             ),
             onChanged: (val) => hint == 'মোবাইল নাম্বার'
                 ? pProvider.userModel.phone = val
-                : hint == 'পাসয়ার্ড'
+                : hint == 'পাসওয়ার্ড'
                 ? pProvider.userModel.password = val
                 : hint == 'এন আইডি নাম্বার'
                 ? pProvider.userModel.nID = val
@@ -199,7 +199,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   height: 15,
                 ),
               ),
-              suffixIcon: hint == 'পাসয়ার্ড'
+              suffixIcon: hint == 'পাসওয়ার্ড'
                   ? GestureDetector(
                   onTap: () => setState(() => _isObscure = !_isObscure),
                   child: Padding(

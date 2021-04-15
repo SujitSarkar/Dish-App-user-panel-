@@ -22,7 +22,7 @@ class _RecoverPasswordState extends State<RecoverPassword> {
     return Scaffold(
       backgroundColor: CustomColors.whiteColor,
       appBar: AppBar(
-        title: Text('পাসয়ার্ড পরিবর্তন করুন'),
+        title: Text('পাসওয়ার্ড পরিবর্তন করুন'),
         elevation: 0,
         centerTitle: true,
       ),
@@ -92,8 +92,8 @@ class _RecoverPasswordState extends State<RecoverPassword> {
             children: <Widget>[
               SizedBox(height: 30),
               _textField('+88 সহ মোবাইল নাম্বার', 'assets/field-icon/icon_phone.png', size),
-              _otpVerified==true? _textField('পাসয়ার্ড', "assets/field-icon/icon_password.png", size):Container(),
-              _otpVerified==true? _textField('কনফার্ম পাসয়ার্ড', "assets/field-icon/icon_password.png", size):Container(),
+              _otpVerified==true? _textField('পাসওয়ার্ড', "assets/field-icon/icon_password.png", size):Container(),
+              _otpVerified==true? _textField('কনফার্ম পাসওয়ার্ড', "assets/field-icon/icon_password.png", size):Container(),
               SizedBox(height: 12),
               _otpVerified==false?GestureDetector(
                 onTap: ()=>_formValidation(pProvider,'নিশ্চিত করুন'),
@@ -141,17 +141,17 @@ class _RecoverPasswordState extends State<RecoverPassword> {
         child: TextField(
             keyboardType:
             hint == '+88 সহ মোবাইল নাম্বার'
-                ? TextInputType.number
+                ? TextInputType.phone
                 : TextInputType.text,
             readOnly: hint=='+88 সহ মোবাইল নাম্বার' && _otpVerified==true
                 ?true:false,
-            obscureText:hint == 'পাসয়ার্ড'? _isObscure ? true : false:false,
+            obscureText:hint == 'পাসওয়ার্ড'? _isObscure ? true : false:false,
             style: Design.subTitleStyle(size).copyWith(
               color: CustomColors.textColor,
             ),
             onChanged: (val) =>
             hint == '+88 সহ মোবাইল নাম্বার' ? _phone = val
-                :hint == 'পাসয়ার্ড'? _password=val
+                :hint == 'পাসওয়ার্ড'? _password=val
                 : _confirmPassword=val,
             decoration: Design.loginFormDecoration.copyWith(
               hintText: hint,
@@ -163,7 +163,7 @@ class _RecoverPasswordState extends State<RecoverPassword> {
                   height: 15,
                 ),
               ),
-              suffixIcon: hint == 'পাসয়ার্ড' || hint =='কনফার্ম পাসয়ার্ড'
+              suffixIcon: hint == 'পাসওয়ার্ড' || hint =='কনফার্ম পাসওয়ার্ড'
                   ? GestureDetector(
                   onTap: () => setState(() => _isObscure = !_isObscure),
                   child: Padding(
@@ -198,8 +198,8 @@ class _RecoverPasswordState extends State<RecoverPassword> {
       if(_password.isNotEmpty && _confirmPassword.isNotEmpty){
         if(_password==_confirmPassword){
 
-        }else showInfo('পাসয়ার্ড দুটির মধ্যে কোন মিল নেই');
-      }else showInfo('পাসয়ার্ড নিশ্চিত করুন');
+        }else showInfo('পাসওয়ার্ড দুটির মধ্যে কোন মিল নেই');
+      }else showInfo('পাসওয়ার্ড নিশ্চিত করুন');
     }
   }
 }

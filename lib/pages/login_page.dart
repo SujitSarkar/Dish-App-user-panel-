@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 SizedBox(height: 30),
                 _textField('মোবাইল নাম্বার', 'assets/field-icon/icon_phone.png', size),
-                _textField('পাসয়ার্ড', "assets/field-icon/icon_password.png", size),
+                _textField('পাসওয়ার্ড', "assets/field-icon/icon_password.png", size),
                 SizedBox(height: 12),
                 GestureDetector(
                   onTap: ()=>_formValidation(pProvider),
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                       textAlign: TextAlign.center,
                       text: TextSpan(children: [
                         TextSpan(
-                            text: 'পাসয়ার্ড পরিবর্তন করুন',
+                            text: 'পাসওয়ার্ড পরিবর্তন করুন',
                             style: Design.titleStyle(size).copyWith(
                               decoration: TextDecoration.underline,
                               color: CustomColors.textColor,
@@ -177,9 +177,9 @@ class _LoginPageState extends State<LoginPage> {
         child: TextField(
             keyboardType:
             hint == 'মোবাইল নাম্বার'
-                ? TextInputType.number
+                ? TextInputType.phone
                 : TextInputType.text,
-            obscureText:hint == 'পাসয়ার্ড'? _isObscure ? true : false:false,
+            obscureText:hint == 'পাসওয়ার্ড'? _isObscure ? true : false:false,
             style: Design.subTitleStyle(size).copyWith(
               color: CustomColors.textColor,
             ),
@@ -196,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 15,
                 ),
               ),
-              suffixIcon: hint == 'পাসয়ার্ড'
+              suffixIcon: hint == 'পাসওয়ার্ড'
                   ? GestureDetector(
                   onTap: () => setState(() => _isObscure = !_isObscure),
                   child: Padding(

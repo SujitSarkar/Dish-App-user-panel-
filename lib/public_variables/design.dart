@@ -48,7 +48,7 @@ class Design {
           borderRadius: BorderRadius.circular(25),
           borderSide: BorderSide(color: CustomColors.borderColor)),
       filled: true,
-      fillColor: CustomColors.whiteColor,
+      fillColor: CustomColors.greyWhite,
       focusColor: CustomColors.borderColor,
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25),
