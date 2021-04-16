@@ -2,7 +2,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:marquee_flutter/marquee_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user_app/pages/login_page.dart';
+import 'package:user_app/providers/public_provider.dart';
 import 'package:user_app/public_variables/colors.dart';
 import 'package:user_app/public_variables/design.dart';
 import 'package:user_app/public_variables/variables.dart';
@@ -14,6 +17,7 @@ import 'package:user_app/sub_pages/profile_page.dart';
 import 'package:user_app/sub_pages/our_services_page.dart';
 import 'package:user_app/widgets/app_bar.dart';
 import 'package:user_app/widgets/home_grid_tile.dart';
+import 'package:user_app/widgets/no_internet.dart';
 import 'package:user_app/widgets/routing_animation.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,24 +27,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  int _counter=0;
+
+  _customInit(PublicProvider pProvider)async{
+    pProvider.checkConnectivity();
+    setState(()=>_counter++);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    final PublicProvider pProvider = Provider.of<PublicProvider>(context);
+    if(_counter==0) _customInit(pProvider);
+
     return Scaffold(
       backgroundColor: CustomColors.whiteColor,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
           child: PublicAppBar(context, Variables.appTitle)),
-      body: _bodyUI(),
+      body: pProvider.internetConnected? _bodyUI(size):NoInternet(),
     );
   }
 
-  Widget _bodyUI() {
-    final Size size = MediaQuery.of(context).size;
+  Widget _bodyUI(Size size) {
+
     return Column(
       children: [
         ///Image Slider
         Container(
-          height: size.width*.5,
+          height: size.width * .5,
           width: size.width,
           child: CarouselSlider(
             options: CarouselOptions(
@@ -83,19 +98,47 @@ class _HomePageState extends State<HomePage> {
                           child: InkWell(
                               borderRadius: Design.borderRadius,
                               splashColor: Theme.of(context).primaryColor,
-                              onTap: () => index == 0
-                                  ?Navigator.push(context, AnimationPageRoute(navigateTo: ProfilePage()))
-                                  : index == 1
-                                      ? Navigator.push(context, AnimationPageRoute(navigateTo: BillingList()))
-                                      : index == 2
-                                          ? Navigator.push(context, AnimationPageRoute(navigateTo: PayBill()))
-                                          : index == 3
-                                              ? Navigator.push(context, AnimationPageRoute(navigateTo: ProblemPage()))
-                                              : index == 4
-                                                  ? Navigator.push(context, AnimationPageRoute(navigateTo: OurServices()))
-                                                  : index == 5
-                                                      ? Navigator.push(context, AnimationPageRoute(navigateTo: ContactUs()))
-                                                      : Navigator.push(context, AnimationPageRoute(navigateTo: LoginPage())),
+                              onTap: () async{
+                                if (index == 0)
+                                  Navigator.push(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: ProfilePage()));
+                                if (index == 1)
+                                  Navigator.push(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: BillingList()));
+                                if (index == 2)
+                                  Navigator.push(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: PayBill()));
+                                if (index == 3)
+                                  Navigator.push(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: ProblemPage()));
+                                if (index == 4)
+                                  Navigator.push(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: OurServices()));
+                                if (index == 5)
+                                  Navigator.push(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: ContactUs()));
+                                if (index == 6){
+                                  SharedPreferences pref =await SharedPreferences.getInstance();
+                                  pref.clear();
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      AnimationPageRoute(
+                                          navigateTo: LoginPage()),
+                                          (route) => false);
+                                }
+                              },
                               child: HomeMenuTile(index: index)),
                         ),
                       )),
@@ -105,6 +148,4 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
-
 }

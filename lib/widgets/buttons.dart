@@ -43,3 +43,26 @@ Widget shadowButton(Size size,String buttonName){
                 )),
           )));
 }
+
+Widget miniOutlineIconButton(
+    BuildContext context, String buttonName,  IconData iconData, Color color) {
+  Size size = MediaQuery.of(context).size;
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(
+        border: Border.all(width: 1, color: color),
+        borderRadius: BorderRadius.all(Radius.circular(10))),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(iconData,color: color,size: size.width*.04),
+        SizedBox(width: 5),
+        Text(
+          buttonName,
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: size.width*.03, color: color),
+        ),
+      ],
+    ),
+  );
+}
