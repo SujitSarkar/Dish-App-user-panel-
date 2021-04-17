@@ -20,7 +20,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isObscure = true;
-  String _phone='',_password='';
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   int _counter=0;
 
   _customInit(PublicProvider pProvider)async{
@@ -110,7 +111,10 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 12),
                 GestureDetector(
                   onTap: ()async{
-                    await pProvider.checkConnectivity().then((value)=>_formValidation(pProvider),onError: (error)=>showInfo(error.toString()));},
+                    await pProvider.checkConnectivity().then((value){
+                      if(pProvider.internetConnected==true) _formValidation(pProvider);
+                      else showInfo('কোনও ইন্টারনেট সংযোগ নেই!');
+                      },onError: (error)=>showInfo(error.toString()));},
                   child: shadowButton(size, 'নিশ্চিত করুন'),
                 ),
                 GestureDetector(
@@ -195,11 +199,12 @@ class _LoginPageState extends State<LoginPage> {
               style: Design.subTitleStyle(size).copyWith(
                 color: CustomColors.textColor,
               ),
-              onChanged: (val) => hint == 'মোবাইল নাম্বার'
-                  ? _phone = val
-                  : _password = val,
+              controller: hint == 'মোবাইল নাম্বার'
+                  ? _phoneController
+                  : _passwordController,
               decoration: Design.loginFormDecoration.copyWith(
                 hintText: hint,
+                labelText: hint,
                 prefixIcon: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Image.asset(
@@ -226,17 +231,17 @@ class _LoginPageState extends State<LoginPage> {
         );
 
     Future<void> _formValidation(PublicProvider pProvider)async{
-      if(_phone.isNotEmpty && _password.isNotEmpty){
-        if(_phone.length==11){
+      if(_phoneController.text.isNotEmpty && _passwordController.text.isNotEmpty){
+        if(_phoneController.text.length==11){
           showLoadingDialog('অপেক্ষা করুন...');
           QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Users')
-              .where('id', isEqualTo: _phone).get();
+              .where('id', isEqualTo: '+88${_phoneController.text}').get();
           final List<QueryDocumentSnapshot> user = snapshot.docs;
 
           if(user.isNotEmpty){
-            if(user[0].get('password')==_password){
+            if(user[0].get('password')==_passwordController.text){
               SharedPreferences pref = await SharedPreferences.getInstance();
-              pref.setString('id', _phone).then((value)async{
+              pref.setString('id', '+88${_phoneController.text}').then((value)async{
                 await pProvider.getUser().then((success){
                   if(success){
                     closeLoadingDialog();
@@ -245,20 +250,20 @@ class _LoginPageState extends State<LoginPage> {
                   }
                   else{
                     closeLoadingDialog();
-                    showInfo('একাউন্ট যাচাই সম্ভব হচ্ছেনা! একটু পর আবার চেষ্টা করুন');
+                    showErrorMgs('একাউন্ট যাচাই সম্ভব হচ্ছেনা! একটু পর আবার চেষ্টা করুন');
                   }
                 },onError: (error){
                   closeLoadingDialog();
-                  showInfo(error.toString());
+                  showErrorMgs(error.toString());
                 });
               });
             }else{
               closeLoadingDialog();
-              showInfo('ভুল পাসওয়ার্ড!');
+              showErrorMgs('ভুল পাসওয়ার্ড!');
             }
           }else{
             closeLoadingDialog();
-            showInfo('এই নাম্বার দিয়ে কোন একাউন্ট খোলা হয়নি!\nআগে একাউন্ট খুলুন');
+            showErrorMgs('এই নাম্বার দিয়ে কোন একাউন্ট খোলা হয়নি!\nআগে একাউন্ট খুলুন');
           }
         }else showInfo('মোবাইল নাম্বার ১১ সংখ্যার হতে হবে');
       }else showInfo('মোবাইল এবং পাসওয়ার্ড প্রদান করুন');

@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:user_app/providers/public_provider.dart';
 import 'package:user_app/public_variables/colors.dart';
 import 'package:user_app/public_variables/design.dart';
+import 'package:user_app/sub_pages/update_user_info.dart';
 import 'package:user_app/widgets/buttons.dart';
+import 'package:user_app/widgets/no_internet.dart';
 import 'package:user_app/widgets/notifications.dart';
+import 'package:user_app/widgets/routing_animation.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -14,11 +19,31 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File _image;
+  // File _image;
+  int _counter=0;
+
+
+  _customInit(PublicProvider pProvider)async{
+    showLoadingDialog('অপেক্ষা করুন...');
+    await pProvider.getUser().then((value){
+      closeLoadingDialog();
+    },onError: (e){
+      closeLoadingDialog();
+      showInfo(e.toString());
+    });
+  }
+  _initializeData(PublicProvider pProvider){
+    pProvider.checkConnectivity();
+    setState(()=> _counter++);
+  }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final PublicProvider pProvider = Provider.of<PublicProvider>(context);
+    if(pProvider.userList.isEmpty) _customInit(pProvider);
+    if(_counter==0) _initializeData(pProvider);
+
     return Scaffold(
       backgroundColor: CustomColors.whiteColor,
       appBar: PreferredSize(
@@ -27,14 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
           backgroundColor: Colors.transparent,
           centerTitle:true,
           elevation: 0,
-          actions: [
-            IconButton(
-                icon: Icon(Icons.camera_alt,color: Colors.white,),
-                splashRadius: size.width*.07,
-                iconSize: size.width*.06,
-                onPressed: ()=> _getImageFromGallery(),
-            )
-          ],
+
           title: Text('প্রোফাইল'),
           flexibleSpace: Container(
             alignment: Alignment.center,
@@ -53,10 +71,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: size.width*.3,
                   width: size.width*.3,
                   decoration: BoxDecoration(
-                    color: Colors.grey[400],
+                    color: CustomColors.greyWhite,
                     borderRadius: BorderRadius.all(Radius.circular(size.width*.7)),
                     image: DecorationImage(
-                      image: _image==null? AssetImage('assets/account.png'):FileImage(_image),
+                      image:  AssetImage('assets/profile_user.png'),
                       fit: BoxFit.cover
                     ),
                       boxShadow: [
@@ -70,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(height: 10),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('আপনার নাম এখানে',
+                  child: Text(pProvider.userList.isEmpty?'লোড হচ্ছে...':pProvider.userList[0].name,
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     style: Design.titleStyle(size),),
@@ -83,92 +101,54 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
 
       ///Body...
-      body: AnimationLimiter(
-        child: ListView.builder(
-          itemCount: 2,
-          itemBuilder: (context,index)=> AnimationConfiguration.staggeredList(
-            position: index,
-            duration: const Duration(milliseconds: 600),
-            child: SlideAnimation(
-              verticalOffset: 400,
-              child: FadeInAnimation(
-                child: CardBuilder(index: index),
-              ),
-            )
+      body: pProvider.internetConnected? AnimationLimiter(
+        child: RefreshIndicator(
+          backgroundColor: CustomColors.whiteColor,
+          onRefresh: ()async{await pProvider.getUser();},
+          child: ListView.builder(
+            itemCount: 4,
+            itemBuilder: (context,index)=> AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 600),
+              child: SlideAnimation(
+                verticalOffset: 400,
+                child: FadeInAnimation(
+                  child: CardBuilder(index: index,pProvider: pProvider),
+                ),
+              )
+          ),
+          ),
         ),
-        ),
+      ):NoInternet(),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: ()=>Navigator.push(context, AnimationPageRoute(navigateTo: UpdateUserInfo())),
+        backgroundColor: CustomColors.appThemeColor,
+        child: Icon(Icons.update_rounded,color: CustomColors.whiteColor),
+        tooltip: 'Update your information',
+        splashColor: CustomColors.greyWhite,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 
-  Future<void> _getImageFromGallery()async{
-    final picker = ImagePicker();
-    final pickedFile = await picker.getImage(source: ImageSource.gallery,maxWidth: 300,maxHeight: 300);
-    if(pickedFile!=null){
-      setState(()=> _image = File(pickedFile.path));
-    }else {
-      showInfo('কোন ছবি নির্বাচন করা হয়নি');
-    }
-  }
+  // Future<void> _getImageFromGallery()async{
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.getImage(source: ImageSource.gallery,maxWidth: 300,maxHeight: 300);
+  //   if(pickedFile!=null){
+  //     setState(()=> _image = File(pickedFile.path));
+  //   }else {
+  //     showInfo('কোন ছবি নির্বাচন করা হয়নি');
+  //   }
+  // }
   
 }
 
 // ignore: must_be_immutable
 class CardBuilder extends StatelessWidget {
+  PublicProvider pProvider;
   int index;
-  CardBuilder({this.index});
-
-  String newAddress='';
-
-  void _showUpdateAddressDialog(BuildContext context, Size size){
-    showAnimatedDialog(
-        context: context,
-        builder: (context){
-          return AlertDialog(
-            scrollable: true,
-            title: Text('আপনার ঠিকানা পরিবর্তন করুন',
-              textAlign: TextAlign.center,style: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize:  size.width*.05
-              ),),
-            content: Column(
-              children: [
-                TextField(
-                  keyboardType: TextInputType.text,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (val)=>newAddress=val,
-                  maxLines: 5,
-                  decoration: Design.formDecoration(size).copyWith(
-                      labelText: 'নতুন ঠিকানা লিখুন'),
-                ),
-                SizedBox(height: size.width*.04),
-
-                InkWell(
-                  onTap: (){
-                    if(newAddress.isNotEmpty){
-
-                    }else showInfo('নতুন ঠিকানা লিখুন');
-                  },
-                  child: smallGradientButton(context, 'পরিবর্তন করুন'),
-                  borderRadius: Design.buttonRadius,
-                  splashColor: Theme.of(context).primaryColor,
-                )
-              ],
-            ),
-
-            actions: [
-              IconButton(
-                  icon: Icon(Icons.arrow_circle_down_outlined,color: CustomColors.deepGrey,size: size.width*.07),
-                  splashRadius: size.width*.07,
-                  onPressed: ()=>Navigator.pop(context)),
-            ],
-          );
-        },
-      animationType: DialogTransitionType.slideFromBottomFade,
-      curve: Curves.fastOutSlowIn,
-      duration: Duration(milliseconds: 500),
-    );
-  }
+  CardBuilder({this.index,this.pProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +156,7 @@ class CardBuilder extends StatelessWidget {
     return Container(
       width: size.width,
       height: size.width*.32,
-      margin: EdgeInsets.only(left: 10,right: 10,top: 20),
+      margin: EdgeInsets.only(left: 10,right: 10,top: 10),
       padding: EdgeInsets.symmetric(horizontal: 8,vertical: 8),
       decoration: BoxDecoration(
         borderRadius: Design.borderRadius,
@@ -198,44 +178,64 @@ class CardBuilder extends StatelessWidget {
               border: Border.all(color: Colors.white,width: 5),
               borderRadius: Design.borderRadius,
               image: DecorationImage(
-                image: AssetImage(index==0?'assets/icon/phone.png':'assets/icon/address.png'),
+                image: AssetImage(index==0?'assets/icon/phone.png'
+                    :index==1?'assets/icon/id_white.png'
+                    :index==2?'assets/icon/user.png'
+                    :'assets/icon/address.png'),
                 fit: BoxFit.contain
               )
             ),
           ),
           Container(
-            width: size.width*.53,
+            width: size.width*.63,
             //color: Colors.green,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(index==0?'মোবাইল নাম্বার':'বড়ির ঠিকানা',
+                Text(index==0?'মোবাইল নাম্বার'
+                    :index==1? 'এন আইডি নাম্বার'
+                    :index==2? 'বাবার নাম'
+                    :'বড়ির ঠিকানা',
                   maxLines: 1,
                   style: Design.titleStyle(size),),
                 SizedBox(height: size.width*.02),
 
-                Text(index==0?'+8801830200087':'House-16(A3), Sonargaon Janapath Road, Sector-12, Uttara, Dhaka',
+                index==0?
+                Text(pProvider.userList.isEmpty?'লোড হচ্ছে...':pProvider.userList[0].phone,
                   maxLines: 4,
                   style: Design.subTitleStyle(size),
                 )
+                    :index==1?
+                Text(pProvider.userList.isEmpty?'লোড হচ্ছে...':pProvider.userList[0].nID,
+                  maxLines: 4,
+                  style: Design.subTitleStyle(size),
+                )
+                    :index==2?
+                Text(pProvider.userList.isEmpty?'লোড হচ্ছে...':pProvider.userList[0].fatherName,
+                  maxLines: 4,
+                  style: Design.subTitleStyle(size),
+                )
+                    :Text(pProvider.userList.isEmpty?'লোড হচ্ছে...':pProvider.userList[0].address,
+                  maxLines: 4,
+                  style: Design.subTitleStyle(size),)
               ],
             ),
           ),
-          Container(
-            width: size.width*.1,
-            decoration: BoxDecoration(
-                //color: Colors.yellow,
-              borderRadius: Design.borderRadius
-            ),
-            child: index==1? InkWell(
-              child: Icon(Icons.edit_rounded,color: CustomColors.whiteColor),
-              borderRadius: Design.borderRadius,
-              splashColor: CustomColors.whiteColor,
-              radius: 30,
-              onTap: ()=>_showUpdateAddressDialog(context, size),
-            ):Container(),
-          )
+          // Container(
+          //   width: size.width*.1,
+          //   decoration: BoxDecoration(
+          //       //color: Colors.yellow,
+          //     borderRadius: Design.borderRadius
+          //   ),
+          //   child: index==2? InkWell(
+          //     child: Icon(Icons.edit_rounded,color: CustomColors.whiteColor),
+          //     borderRadius: Design.borderRadius,
+          //     splashColor: CustomColors.whiteColor,
+          //     radius: 30,
+          //     onTap: ()=>_showUpdateAddressDialog(context, size),
+          //   ):Container(),
+          // )
         ],
       ),
     );

@@ -2,16 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user_app/model/problem_model.dart';
 import 'package:user_app/model/user_model.dart';
 
 class PublicProvider extends ChangeNotifier{
 
   UserModel _userModel = UserModel();
-  List<UserModel> _userList = [];
   bool _internetConnected=true;
+  List<UserModel> _userList = [];
+  List<ProblemModel> _problemList = [];
+
 
   get userModel=> _userModel;
   get userList=> _userList;
+  get problemList=> _problemList;
   get internetConnected=> _internetConnected;
 
   set userModel(UserModel val){
@@ -42,7 +46,7 @@ class PublicProvider extends ChangeNotifier{
 
   Future<bool> isUserRegistered(String id)async{
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Users')
-        .where('id', isEqualTo: id).get();
+        .where('id', isEqualTo: '+88$id').get();
     final List<QueryDocumentSnapshot> user = snapshot.docs;
     if(user.isEmpty){
       return false;
@@ -54,8 +58,8 @@ class PublicProvider extends ChangeNotifier{
   Future<bool> registerUser(PublicProvider pProvider)async{
     try{
       int timeStamp = DateTime.now().millisecondsSinceEpoch;
-      await FirebaseFirestore.instance.collection('Users').doc(pProvider.userModel.phone).set({
-      'id':pProvider.userModel.phone,
+      await FirebaseFirestore.instance.collection('Users').doc('+88${pProvider.userModel.phone}').set({
+      'id':'+88${pProvider.userModel.phone}',
       'phone':pProvider.userModel.phone,
         'name':pProvider.userModel.name,
       'password':pProvider.userModel.password,
@@ -75,8 +79,9 @@ class PublicProvider extends ChangeNotifier{
 
   Future<bool> getUser()async{
     try{
-      String id = await getPrefID();
+      final String id = await getPrefID();
       await FirebaseFirestore.instance.collection('Users').where('id', isEqualTo: id).get().then((snapshot){
+        _userList.clear();
         snapshot.docChanges.forEach((element) {
           UserModel userModel = UserModel(
               id: element.doc['id'],
@@ -92,6 +97,70 @@ class PublicProvider extends ChangeNotifier{
               day: element.doc['day'],
           );
           _userList.add(userModel);
+        });
+      });
+      notifyListeners();
+      return Future.value(true);
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> updateUser(Map<String, String> dataMap)async{
+    try{
+      final String id = await getPrefID();
+      await FirebaseFirestore.instance.collection('Users').doc(id).update(dataMap);
+      return Future.value(true);
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> recoverUserPassword(String id, String password)async{
+    try{
+      await FirebaseFirestore.instance.collection('Users').doc(id).update({
+        'password':password,
+      });
+      return Future.value(true);
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> submitProblem(String problem)async{
+    try{
+      String id = await getPrefID();
+      int timeStamp = DateTime.now().millisecondsSinceEpoch;
+      if(userList.isEmpty) getUser();
+      await FirebaseFirestore.instance.collection('UserProblems').doc('$id$timeStamp').set({
+        'id':'$id$timeStamp',
+        'name':userList[0].name,
+        'phone': userList[0].id,
+        'address':userList[0].address,
+        'problem': problem,
+        'timeStamp': timeStamp.toString(),
+      });
+      return Future.value(true);
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> getAllProblems()async{
+    try{
+       String id = await getPrefID();
+      await FirebaseFirestore.instance.collection('UserProblems').where('phone', isEqualTo: id).orderBy('timeStamp',descending: true).get().then((snapshot){
+        _problemList.clear();
+        snapshot.docChanges.forEach((element) {
+          ProblemModel problemModel = ProblemModel(
+            id: element.doc['id'],
+            name: element.doc['name'],
+            phone: element.doc['phone'],
+            address: element.doc['address'],
+            problem: element.doc['problem'],
+            timeStamp: element.doc['timeStamp'],
+          );
+          _problemList.add(problemModel);
         });
       });
       notifyListeners();

@@ -1,5 +1,8 @@
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:user_app/providers/public_provider.dart';
 import 'package:user_app/public_variables/colors.dart';
 import 'package:user_app/public_variables/design.dart';
 
@@ -11,6 +14,7 @@ class ProblemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final PublicProvider pProvider = Provider.of<PublicProvider>(context);
     return Container(
       width: size.width,
       //height: size.width*.25,
@@ -27,9 +31,7 @@ class ProblemTile extends StatelessWidget {
 
         title:
         ExpandableText(
-          'গত তিন দিন ধরে আমাদের বাড়িতে কোন চ্যানেল দেখা যাচ্ছে না। '
-              'গত তিন দিন ধরে আমাদের বাড়িতে কোন চ্যানেল দেখা যাচ্ছে না। '
-              'গত তিন দিন ধরে আমাদের বাড়িতে কোন চ্যানেল দেখা যাচ্ছে না।',
+          pProvider.problemList[index].problem,
           expandText: '>>',
           collapseText: '<<',
           maxLines: 3,
@@ -38,7 +40,7 @@ class ProblemTile extends StatelessWidget {
           style: Design.subTitleStyle(size).copyWith(color: CustomColors.textColor,fontWeight: FontWeight.w500),
         ),
 
-        subtitle: Text('10-Jan-2021',
+        subtitle: Text(DateFormat("dd-MMM-yyyy").format(DateTime.fromMillisecondsSinceEpoch(int.parse(pProvider.problemList[index].timeStamp))).toString(),
           style: Design.subTitleStyle(size).copyWith(color: Colors.grey[700]),
         ),
       ),

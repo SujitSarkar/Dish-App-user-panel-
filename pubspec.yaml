@@ -62,7 +62,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/account.png
+    - assets/profile_user.png
     - assets/gradient_backgound.jpg
     - assets/gradient_image.jpg
     - assets/g_banner.png
@@ -73,14 +73,16 @@ flutter:
     - assets/icon/taka1.png
     - assets/icon/dish.png
     - assets/icon/internet.png
+    - assets/icon/user.png
+    - assets/icon/id_white.png
     #field icon
     - assets/field-icon/icon_eye_close.png
     - assets/field-icon/icon_eye_open.png
     - assets/field-icon/icon_password.png
     - assets/field-icon/icon_user.png
     - assets/field-icon/icon_phone.png
-    - assets/field-icon/icon_pad.png
     - assets/field-icon/icon_address.png
+    - assets/field-icon/icon_id.png
     #slider image
     - assets/slider-image/img1.jpg
     - assets/slider-image/img2.jpg

@@ -114,7 +114,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   _textField('পাসওয়ার্ড', "assets/field-icon/icon_password.png",
                       size, pProvider),
                   _textField('এন আইডি নাম্বার',
-                      "assets/field-icon/icon_pad.png", size, pProvider),
+                      "assets/field-icon/icon_id.png", size, pProvider),
                   _textField('বাবার নাম', "assets/field-icon/icon_user.png",
                       size, pProvider),
                   _textField('বাড়ির ঠিকানা',
@@ -123,8 +123,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   GestureDetector(
                     onTap: () async {
                       await pProvider.checkConnectivity().then(
-                          (value) => _formValidation(pProvider),
-                          onError: (error) => showInfo(error.toString()));
+                          (value){
+                            if(pProvider.internetConnected==true)_formValidation(pProvider);
+                            else showInfo('কোনও ইন্টারনেট সংযোগ নেই!');
+                          },
+                          onError: (error) => showErrorMgs(error.toString()));
                     },
                     child: shadowButton(size, 'নিশ্চিত করুন'),
                   ),
@@ -250,7 +253,7 @@ class _SignUpPageState extends State<SignUpPage> {
             await pProvider.registerUser(pProvider).then((success) async {
               if (success) {
                 SharedPreferences pref = await SharedPreferences.getInstance();
-                pref.setString('id', pProvider.userModel.phone).then(
+                pref.setString('id', '+88${pProvider.userModel.phone}').then(
                     (preference) async {
                   await pProvider.getUser().then((value) {
                     if (value == true) {
@@ -262,7 +265,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           (route) => false);
                     } else {
                       closeLoadingDialog();
-                      showInfo(
+                      showErrorMgs(
                           'একাউন্ট খোলা সম্ভব হচ্ছেনা! একটু পর আবার চেষ্টা করুন');
                     }
                   }, onError: (error) {
@@ -275,7 +278,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 });
               } else {
                 closeLoadingDialog();
-                showInfo(
+                showErrorMgs(
                     'একাউন্ট খোলা সম্ভব হচ্ছেনা! একটু পর আবার চেষ্টা করুন');
               }
             }, onError: (error) {
@@ -284,7 +287,7 @@ class _SignUpPageState extends State<SignUpPage> {
             });
           } else {
             closeLoadingDialog();
-            showInfo('এই নাম্বার দিয়ে একাউন্ট খোলা হয়েছে!');
+            showErrorMgs('এই নাম্বার দিয়ে একাউন্ট খোলা হয়েছে!');
           }
         }, onError: (error) {
           closeLoadingDialog();
