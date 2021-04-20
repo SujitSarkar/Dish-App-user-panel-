@@ -21,12 +21,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String id;
+  String _id;
 
   @override
   void initState() {
     super.initState();
-    _checkPreferences();
     EasyLoading.instance
       ..displayDuration = const Duration(milliseconds: 3000) //display duration of [showSuccess] [showError] [showInfo], default 2000ms.
       ..indicatorType = EasyLoadingIndicatorType.fadingCircle
@@ -41,11 +40,12 @@ class _MyAppState extends State<MyApp> {
       ..userInteractions = true
       ..dismissOnTap = false;
       // ..customAnimation = CustomAnimation();
+    _checkPreferences();
   }
 
   void _checkPreferences() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(()=> id = preferences.get('id'));
+    setState(()=> _id = preferences.get('id'));
   }
 
   @override
@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: MaterialColor(0xff0095B2, CustomColors.themeMapColor),
           canvasColor: Colors.transparent,
         ),
-        home: id==null? LoginPage():HomePage(),
+        home: _id==null? LoginPage():HomePage(),
         builder: EasyLoading.init(),
       ),
     );

@@ -114,7 +114,8 @@ class _LoginPageState extends State<LoginPage> {
                     await pProvider.checkConnectivity().then((value){
                       if(pProvider.internetConnected==true) _formValidation(pProvider);
                       else showInfo('কোনও ইন্টারনেট সংযোগ নেই!');
-                      },onError: (error)=>showInfo(error.toString()));},
+                      },onError: (error)=>showInfo(error.toString()));
+                    },
                   child: shadowButton(size, 'নিশ্চিত করুন'),
                 ),
                 GestureDetector(

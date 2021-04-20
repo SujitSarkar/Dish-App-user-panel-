@@ -1,14 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:user_app/providers/public_provider.dart';
 import 'package:user_app/public_variables/colors.dart';
 import 'package:user_app/public_variables/design.dart';
 import 'package:user_app/sub_pages/update_user_info.dart';
-import 'package:user_app/widgets/buttons.dart';
 import 'package:user_app/widgets/no_internet.dart';
 import 'package:user_app/widgets/notifications.dart';
 import 'package:user_app/widgets/routing_animation.dart';
@@ -33,8 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
   _initializeData(PublicProvider pProvider){
-    pProvider.checkConnectivity();
     setState(()=> _counter++);
+    pProvider.checkConnectivity();
   }
 
   @override
@@ -123,12 +119,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
       floatingActionButton: FloatingActionButton(
         onPressed: ()=>Navigator.push(context, AnimationPageRoute(navigateTo: UpdateUserInfo())),
-        backgroundColor: CustomColors.appThemeColor,
-        child: Icon(Icons.update_rounded,color: CustomColors.whiteColor),
+        backgroundColor: CustomColors.whiteColor,
+        child: Icon(Icons.update_rounded,color: CustomColors.appThemeColor),
         tooltip: 'Update your information',
         splashColor: CustomColors.greyWhite,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 

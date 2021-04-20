@@ -7,9 +7,8 @@ class UserModel{
   String fatherName;
   String address;
   String timeStamp;
-  String month;
-  String year;
-  String day;
+  String monthYear;
+  String billingState;
   UserModel({this.id,this.address,this.phone,this.password,this.name,
-    this.fatherName,this.nID,this.timeStamp,this.year,this.month,this.day});
+    this.fatherName,this.nID,this.timeStamp,this.monthYear,this.billingState});
 }

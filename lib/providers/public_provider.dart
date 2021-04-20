@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user_app/model/billing_info_model.dart';
 import 'package:user_app/model/problem_model.dart';
 import 'package:user_app/model/user_model.dart';
 
@@ -11,12 +12,16 @@ class PublicProvider extends ChangeNotifier{
   bool _internetConnected=true;
   List<UserModel> _userList = [];
   List<ProblemModel> _problemList = [];
+  List<BillingInfoModel> _approvedBillList = [];
+  List<BillingInfoModel> _pendingBillList = [];
 
 
   get userModel=> _userModel;
   get userList=> _userList;
   get problemList=> _problemList;
   get internetConnected=> _internetConnected;
+  get approvedBillList=> _approvedBillList;
+  get pendingBillList=> _pendingBillList;
 
   set userModel(UserModel val){
     val= UserModel();
@@ -67,9 +72,8 @@ class PublicProvider extends ChangeNotifier{
       'fatherName':pProvider.userModel.fatherName,
       'address':pProvider.userModel.address,
       'timeStamp': timeStamp.toString(),
-      'month': DateTime.now().month.toString(),
-      'year': DateTime.now().year.toString(),
-      'day': DateTime.now().day.toString(),
+      'monthYear': null,
+       'billingState':null
       });
       return Future.value(true);
     }catch(error){
@@ -92,9 +96,8 @@ class PublicProvider extends ChangeNotifier{
               fatherName: element.doc['fatherName'],
               address: element.doc['address'],
               timeStamp: element.doc['timeStamp'],
-              month: element.doc['month'],
-              year: element.doc['year'],
-              day: element.doc['day'],
+              monthYear: element.doc['monthYear'],
+              billingState: element.doc['billingState']
           );
           _userList.add(userModel);
         });
@@ -165,6 +168,83 @@ class PublicProvider extends ChangeNotifier{
       });
       notifyListeners();
       return Future.value(true);
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> submitBill(DateTime date,String billType, String billingNumber, String transactionId,String amount)async{
+    try{
+      String id = await getPrefID();
+      int timeStamp = DateTime.now().millisecondsSinceEpoch;
+      if(userList.isEmpty) getUser();
+      await FirebaseFirestore.instance.collection('UserBillingInfo').doc('$id$timeStamp').set({
+       'id': '$id$timeStamp',
+       'name': userList[0].name,
+       'userID': id,
+       'userPhone': userList[0].phone,
+       'monthYear': '${date.month}/${date.year}',
+       'billType': billType,
+       'billingNumber': billingNumber,
+       'transactionId': transactionId,
+        'amount':amount,
+       'state': 'pending',
+       'timeStamp': timeStamp.toString()
+      }).then((value)async{
+        await FirebaseFirestore.instance.collection('Users').doc(id).update({
+          'billingState': 'pending',
+          'monthYear': '${date.month}/${date.year}',
+        });
+      });
+      return Future.value(true);
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> getBillingInfo()async{
+    try{
+      String id = await getPrefID();
+      await FirebaseFirestore.instance.collection('UserBillingInfo').where('userID', isEqualTo: id).orderBy('timeStamp',descending: true).get().then((snapshot){
+        _pendingBillList.clear();
+        _approvedBillList.clear();
+        snapshot.docChanges.forEach((element) {
+          if(element.doc['state']=='pending'){
+            BillingInfoModel pendingBillingInfo = BillingInfoModel(
+              id: element.doc['id'],
+              name: element.doc['name'],
+              userPhone: element.doc['userPhone'],
+              userID: element.doc['userID'],
+              monthYear:element.doc['monthYear'],
+              amount: element.doc['amount'],
+              billType:element.doc['billType'],
+              billingNumber:element.doc['billingNumber'],
+              transactionId:element.doc['transactionId'],
+              state:element.doc['state'],
+              timeStamp: element.doc['timeStamp'],
+            );
+            _pendingBillList.add(pendingBillingInfo);
+          }else if(element.doc['state']=='approved'){
+            BillingInfoModel approvedBillingInfo = BillingInfoModel(
+              id: element.doc['id'],
+              name: element.doc['name'],
+              userPhone: element.doc['userPhone'],
+              userID: element.doc['userID'],
+              monthYear:element.doc['monthYear'],
+              amount: element.doc['amount'],
+              billType:element.doc['billType'],
+              billingNumber:element.doc['billingNumber'],
+              transactionId:element.doc['transactionId'],
+              state:element.doc['state'],
+              timeStamp: element.doc['timeStamp'],
+            );
+            _approvedBillList.add(approvedBillingInfo);
+          }
+        });
+      });
+      notifyListeners();
+      return Future.value(true);
+
     }catch(error){
       return Future.value(false);
     }

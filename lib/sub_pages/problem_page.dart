@@ -21,9 +21,10 @@ class _ProblemPageState extends State<ProblemPage> {
   int _counter=0;
 
   _customInit(PublicProvider pProvider)async{
-    pProvider.checkConnectivity();
-    pProvider.getAllProblems();
     setState(()=>_counter++);
+    showLoadingDialog('অপেক্ষা করুন...');
+    await pProvider.checkConnectivity();
+    await pProvider.getAllProblems().then((value)=>closeLoadingDialog());
   }
 
   @override

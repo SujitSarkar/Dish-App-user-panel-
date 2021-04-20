@@ -23,12 +23,12 @@ class _UpdateUserInfoState extends State<UpdateUserInfo> {
   TextEditingController _addressController = TextEditingController();
 
   _customInit(PublicProvider pProvider)async{
+    setState(()=>_counter++);
     pProvider.checkConnectivity();
     _nameController.text = pProvider.userList[0].name??'';
     _nidController.text = pProvider.userList[0].nID??'';
     _fatherController.text = pProvider.userList[0].fatherName??'';
     _addressController.text =pProvider.userList[0].address??'';
-    setState(()=>_counter++);
   }
 
   @override

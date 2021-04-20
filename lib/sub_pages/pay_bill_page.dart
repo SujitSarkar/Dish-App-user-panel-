@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:user_app/providers/public_provider.dart';
 import 'package:user_app/public_variables/colors.dart';
 import 'package:user_app/public_variables/design.dart';
 import 'package:user_app/public_variables/variables.dart';
 import 'package:user_app/widgets/app_bar.dart';
 import 'package:user_app/widgets/buttons.dart';
 import 'package:user_app/widgets/instruction_tile.dart';
+import 'package:user_app/widgets/no_internet.dart';
 import 'package:user_app/widgets/notifications.dart';
 
 class PayBill extends StatefulWidget {
@@ -13,25 +16,39 @@ class PayBill extends StatefulWidget {
 }
 
 class _PayBillState extends State<PayBill> {
-  String _phoneNumber = '', _transId = '', _billType;
+  String _billType;
   DateTime _date;
   TextEditingController _dateController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _transIdController = TextEditingController();
+  TextEditingController _amountController = TextEditingController();
+
+  int _counter=0;
+
+  _customInit(PublicProvider pProvider)async{
+    setState(()=>_counter++);
+    showLoadingDialog('অপেক্ষা করুন...');
+    pProvider.checkConnectivity();
+    pProvider.getAllProblems().then((value)=>closeLoadingDialog());
+  }
 
   @override
   Widget build(BuildContext context) {
+    //final Size size = MediaQuery.of(context).size;
+    final PublicProvider pProvider = Provider.of<PublicProvider>(context);
+    if(_counter==0) _customInit(pProvider);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: PublicAppBar(context, "বিল পরিশোধ করুন"),
       ),
-      body: _bodyUI(),
+      body: pProvider.internetConnected==true? _bodyUI(pProvider):NoInternet(),
     );
   }
 
-  Widget _bodyUI() {
+  Widget _bodyUI(PublicProvider pProvider) {
     final Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Container(
@@ -132,13 +149,18 @@ class _PayBillState extends State<PayBill> {
                     SizedBox(height: size.width * .03),
 
                     _textField('মোবাইল নাম্বার', size),
-                    //SizedBox(height: size.width * .03),
 
                     _textField('ট্রানজেকশন আইডি', size),
+                    _textField('বিলের পরিমান', size),
                     SizedBox(height: size.width * .04),
 
                     InkWell(
-                      onTap: ()=> _formValidation(),
+                      onTap: ()async{
+                        await pProvider.checkConnectivity().then((value){
+                          if(pProvider.internetConnected==true) _formValidation(pProvider);
+                          else showErrorMgs('কোনও ইন্টারনেট সংযোগ নেই');
+                        },onError: (error)=>showErrorMgs(error.toString()));
+                      },
                       child: smallGradientButton(context, 'নিশ্চিত করুন'),
                       borderRadius: Design.buttonRadius,
                       splashColor: Theme.of(context).primaryColor,
@@ -154,18 +176,33 @@ class _PayBillState extends State<PayBill> {
     );
   }
 
-  void _formValidation(){
+  void _formValidation(PublicProvider pProvider){
     if(_dateController.text.isNotEmpty){
       if(_billType!=null){
-        if (_phoneNumber.isNotEmpty && _transId.isNotEmpty) {
-          if(_phoneNumber.length==11){
-
+        if (_phoneController.text.isNotEmpty && _transIdController.text.isNotEmpty && _amountController.text.isNotEmpty) {
+          if(_phoneController.text.length==11){
+            showLoadingDialog('অপেক্ষা করুন...');
+            pProvider.submitBill(_date,_billType, _phoneController.text, _transIdController.text,_amountController.text).then((success){
+              if(success==true){
+                closeLoadingDialog();
+                showSuccessMgs('বিল প্রদান সম্পন্ন হয়েছে');
+                _phoneController.clear();
+                _transIdController.clear();
+                _amountController.clear();
+              }else{
+                closeLoadingDialog();
+                showErrorMgs('বিল প্রদান অসম্পন্ন হয়েছে!');
+              }
+            },onError: (error){
+              closeLoadingDialog();
+              showErrorMgs(error.toString());
+            });
           }else
             showInfo(
                 'মোবাইল নাম্বার অবশ্যই ১১ সংখ্যার হতে হবে');
         } else
           showInfo(
-              'মোবাইল নাম্বার এবং ট্রানজেকশন আইডি নিশ্চিত করুন');
+              'মোবাইল নাম্বার, ট্রানজেকশন আইডি এবং বিলের পরিমান নিশ্চিত করুন');
       }else
         showInfo(
             'বিলের বিবরণ নিশ্চিত করুন');
@@ -194,12 +231,11 @@ class _PayBillState extends State<PayBill> {
         controller:
             hint == 'তারিখ' ? _dateController
                 : hint == 'মোবাইল নাম্বার' ? _phoneController
+                : hint == 'বিলের পরিমান' ? _amountController
                 : _transIdController,
-        onChanged: (val) =>
-        hint == 'মোবাইল নাম্বার'
-            ? _phoneNumber = _phoneController.text
-            : _transId = _transIdController.text,
         keyboardType: hint == 'মোবাইল নাম্বার'
+            ? TextInputType.phone
+            : hint == 'বিলের পরিমান'
             ? TextInputType.number
             : TextInputType.text,
         decoration: Design.formDecoration(size).copyWith(labelText: hint),
