@@ -30,8 +30,9 @@ class _HomePageState extends State<HomePage> {
   int _counter=0;
 
   _customInit(PublicProvider pProvider)async{
-    pProvider.checkConnectivity();
     setState(()=>_counter++);
+    await pProvider.checkConnectivity();
+    await pProvider.getDetails();
   }
 
   @override

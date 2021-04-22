@@ -5,6 +5,7 @@ class ProblemModel{
   String address;
   String problem;
   String timeStamp;
+  String state;
 
-  ProblemModel({this.id, this.name, this.address, this.problem, this.timeStamp,this.phone});
+  ProblemModel({this.id, this.name, this.address, this.problem, this.timeStamp,this.phone,this.state});
 }

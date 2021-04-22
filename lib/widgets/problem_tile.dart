@@ -40,8 +40,16 @@ class ProblemTile extends StatelessWidget {
           style: Design.subTitleStyle(size).copyWith(color: CustomColors.textColor,fontWeight: FontWeight.w500),
         ),
 
-        subtitle: Text(DateFormat("dd-MMM-yyyy").format(DateTime.fromMillisecondsSinceEpoch(int.parse(pProvider.problemList[index].timeStamp))).toString(),
-          style: Design.subTitleStyle(size).copyWith(color: Colors.grey[700]),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(DateFormat("dd-MMM-yyyy").format(DateTime.fromMillisecondsSinceEpoch(int.parse(pProvider.problemList[index].timeStamp))).toString(),
+                style: Design.subTitleStyle(size).copyWith(color: Colors.grey[700])),
+            Text(
+              pProvider.problemList[index].state=='no'?'অমীমাংসিত':'মীমাংসিত',
+              style: Design.subTitleStyle(size).copyWith(color: Colors.grey[700],fontStyle: FontStyle.italic),
+            )
+          ],
         ),
       ),
     );

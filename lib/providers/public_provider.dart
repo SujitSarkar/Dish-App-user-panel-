@@ -14,6 +14,7 @@ class PublicProvider extends ChangeNotifier{
   List<ProblemModel> _problemList = [];
   List<BillingInfoModel> _approvedBillList = [];
   List<BillingInfoModel> _pendingBillList = [];
+  String _address,_customerCare,_aboutUs,_services;
 
 
   get userModel=> _userModel;
@@ -22,6 +23,11 @@ class PublicProvider extends ChangeNotifier{
   get internetConnected=> _internetConnected;
   get approvedBillList=> _approvedBillList;
   get pendingBillList=> _pendingBillList;
+
+  get address=> _address;
+  get customerCare=> _customerCare;
+  get aboutUs=> _aboutUs;
+  get services=> _services;
 
   set userModel(UserModel val){
     val= UserModel();
@@ -141,6 +147,7 @@ class PublicProvider extends ChangeNotifier{
         'phone': userList[0].id,
         'address':userList[0].address,
         'problem': problem,
+        'state': 'no',
         'timeStamp': timeStamp.toString(),
       });
       return Future.value(true);
@@ -162,6 +169,7 @@ class PublicProvider extends ChangeNotifier{
             address: element.doc['address'],
             problem: element.doc['problem'],
             timeStamp: element.doc['timeStamp'],
+            state: element.doc['state'],
           );
           _problemList.add(problemModel);
         });
@@ -245,6 +253,24 @@ class PublicProvider extends ChangeNotifier{
       notifyListeners();
       return Future.value(true);
 
+    }catch(error){
+      return Future.value(false);
+    }
+  }
+
+  Future<bool> getDetails()async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('OfficeDetails').get();
+      final List<QueryDocumentSnapshot> addressSnapshot = snapshot.docs;
+      if(addressSnapshot.isNotEmpty) {
+        _address = addressSnapshot[0].get('address');
+        _customerCare = addressSnapshot[0].get('customerCare');
+        _aboutUs = addressSnapshot[0].get('aboutUs');
+        _services = addressSnapshot[0].get('ourService');
+      }
+      notifyListeners();
+      return Future.value(true);
     }catch(error){
       return Future.value(false);
     }

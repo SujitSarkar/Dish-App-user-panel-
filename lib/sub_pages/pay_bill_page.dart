@@ -27,9 +27,7 @@ class _PayBillState extends State<PayBill> {
 
   _customInit(PublicProvider pProvider)async{
     setState(()=>_counter++);
-    showLoadingDialog('অপেক্ষা করুন...');
     pProvider.checkConnectivity();
-    pProvider.getAllProblems().then((value)=>closeLoadingDialog());
   }
 
   @override
@@ -208,7 +206,7 @@ class _PayBillState extends State<PayBill> {
             'বিলের বিবরণ নিশ্চিত করুন');
     }else
       showInfo(
-          'বিলের তারিখ নিশ্চিত করুন');
+          'বিলের মাস নিশ্চিত করুন');
   }
 
   void _pickDate(){

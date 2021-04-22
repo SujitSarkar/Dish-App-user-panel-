@@ -51,15 +51,15 @@ class _BillingListState extends State<BillingList>
         elevation: 0,
         title: Text('বিলের তথ্য'),
         bottom: new TabBar(controller: _controller, tabs: [
-          Tab(text: "বিচারাধীন"),
           Tab(text: "অনুমোদিত"),
+          Tab(text: "বিচারাধীন"),
         ]),
       ),
       body:pProvider.internetConnected==true? TabBarView(
         controller: _controller,
         children: <Widget>[
-          PendingBill(),
           ApprovedBill(),
+          PendingBill(),
         ],
       ):NoInternet(),
     );
