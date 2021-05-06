@@ -18,7 +18,6 @@ class UpdateUserInfo extends StatefulWidget {
 class _UpdateUserInfoState extends State<UpdateUserInfo> {
   int _counter=0;
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _nidController = TextEditingController();
   TextEditingController _fatherController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
 
@@ -26,7 +25,6 @@ class _UpdateUserInfoState extends State<UpdateUserInfo> {
     setState(()=>_counter++);
     pProvider.checkConnectivity();
     _nameController.text = pProvider.userList[0].name??'';
-    _nidController.text = pProvider.userList[0].nID??'';
     _fatherController.text = pProvider.userList[0].fatherName??'';
     _addressController.text =pProvider.userList[0].address??'';
   }
@@ -57,14 +55,6 @@ class _UpdateUserInfoState extends State<UpdateUserInfo> {
             textCapitalization: TextCapitalization.words,
             decoration: Design.formDecoration(size).copyWith(
                 labelText: 'আপনার নাম'),
-          ),
-          SizedBox(height: size.width*.04),
-          TextField(
-            controller: _nidController,
-            keyboardType: TextInputType.text,
-            textCapitalization: TextCapitalization.words,
-            decoration: Design.formDecoration(size).copyWith(
-                labelText: 'এন আইডি নাম্বার'),
           ),
           SizedBox(height: size.width*.04),
           TextField(
@@ -101,11 +91,10 @@ class _UpdateUserInfoState extends State<UpdateUserInfo> {
   }
 
   _checkValidity(PublicProvider pProvider)async{
-    if(_nameController.text.isNotEmpty && _nidController.text.isNotEmpty &&
+    if(_nameController.text.isNotEmpty &&
         _fatherController.text.isNotEmpty && _addressController.text.isNotEmpty){
       Map<String, String> dataMap = {
         'name': _nameController.text,
-        'nID': _nidController.text,
         'fatherName': _fatherController.text,
         'address': _addressController.text,
       };

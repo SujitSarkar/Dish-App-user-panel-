@@ -8,6 +8,7 @@ import 'package:user_app/pages/signup_page.dart';
 import 'package:user_app/providers/public_provider.dart';
 import 'package:user_app/public_variables/colors.dart';
 import 'package:user_app/public_variables/design.dart';
+import 'package:user_app/public_variables/variables.dart';
 import 'package:user_app/widgets/buttons.dart';
 import 'package:user_app/widgets/no_internet.dart';
 import 'package:user_app/widgets/notifications.dart';
@@ -61,13 +62,15 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: EdgeInsets.only(
                       left: 15,right: 15, top: size.width*.08),
-                  child: Hero(
-                    tag: 'hero-login',
-                    child: Image.asset(
-                      'assets/g_banner.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
+
+                  child: Text(Variables.appTitle,style: TextStyle(color: Colors.white,fontSize: size.width*.07),),
+                  // child: Hero(
+                  //   tag: 'hero-login',
+                  //   child: Image.asset(
+                  //     'assets/g_banner.png',
+                  //     fit: BoxFit.contain,
+                  //   ),
+                  // ),
                 ),
               ],
             ),
@@ -135,29 +138,29 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap:()=>Navigator.push(context, AnimationPageRoute(navigateTo: SignUpPage())),
-                  child: Padding(
-                    padding:EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 10),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(children: [
-                        TextSpan(
-                            text: 'আপনার একাউন্ট নেই?' + '\n',
-                            style: Design.subTitleStyle(size).copyWith(
-                              color: CustomColors.textColor,
-                            )),
-                        TextSpan(
-                            text: 'একাউন্ট খুলুন',
-                            style: Design.titleStyle(size).copyWith(
-                              decoration: TextDecoration.underline,
-                              color: CustomColors.textColor,
-                            )),
-                      ]),
-                    ),
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap:()=>Navigator.push(context, AnimationPageRoute(navigateTo: SignUpPage())),
+                //   child: Padding(
+                //     padding:EdgeInsets.symmetric(
+                //         vertical: 15, horizontal: 10),
+                //     child: RichText(
+                //       textAlign: TextAlign.center,
+                //       text: TextSpan(children: [
+                //         TextSpan(
+                //             text: 'আপনার একাউন্ট নেই?' + '\n',
+                //             style: Design.subTitleStyle(size).copyWith(
+                //               color: CustomColors.textColor,
+                //             )),
+                //         TextSpan(
+                //             text: 'একাউন্ট খুলুন',
+                //             style: Design.titleStyle(size).copyWith(
+                //               decoration: TextDecoration.underline,
+                //               color: CustomColors.textColor,
+                //             )),
+                //       ]),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -165,7 +168,9 @@ class _LoginPageState extends State<LoginPage> {
         Align(
           alignment: Alignment.bottomCenter,
           child: GestureDetector(
-            onTap: (){},
+            onTap: (){
+              launchInWebViewWithJavaScript(context,'https://glamworlditltd.com/');
+            },
             child: RichText(
               textAlign: TextAlign.center,
               text: TextSpan(children: [

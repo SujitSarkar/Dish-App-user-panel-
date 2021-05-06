@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 // import 'package:flutter/cupertino.dart';
 
 class Variables {
-  static final String appTitle = 'Example Dish Cable';
-  static final String customerCareNumber= '01830200087\n01987354802';
-  static final String officeAddress= 'House-16(A3), Sonargaon Janapath Road, Sector-12, Uttara, Dhaka';
+  static final String appTitle = 'পারভেজ স্যাটেলাইট';
+  static final String appLongTitle = 'পারভেজ ইউনাইটেড স্যাটেলাইট, চর-চারুয়া, দাউদকান্দি, কুমিল্লা';
   static final String paymentInstruction =
       'আপনার ডিস বিল টি পরিশোধ করতে প্রথমে ক্যালেন্ডার থেকে যে মাসের বিল দিতে '
       'চান সেই মাস টি চয়ন করুন। তারপর নিন্মে বর্নিত নাম্বারে আপনার \"বিকাশ\" অথবা \"রকেট\" থেকে সেন্ড-মানি করুন। '
@@ -38,7 +37,7 @@ class Variables {
 
   static final List<String> imgList = [
     'assets/slider-image/img1.jpg',
-    'assets/slider-image/img2.jpg',
+    'assets/slider-image/img2.png',
     'assets/slider-image/img3.jpg',
     'assets/slider-image/img4.jpg',
     'assets/slider-image/img5.jpg',

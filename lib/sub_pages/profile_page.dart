@@ -189,7 +189,7 @@ class CardBuilder extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(index==0?'মোবাইল নাম্বার'
-                    :index==1? 'এন আইডি নাম্বার'
+                    :index==1? 'লাইন নাম্বার'
                     :index==2? 'বাবার নাম'
                     :'বড়ির ঠিকানা',
                   maxLines: 1,
@@ -217,20 +217,6 @@ class CardBuilder extends StatelessWidget {
               ],
             ),
           ),
-          // Container(
-          //   width: size.width*.1,
-          //   decoration: BoxDecoration(
-          //       //color: Colors.yellow,
-          //     borderRadius: Design.borderRadius
-          //   ),
-          //   child: index==2? InkWell(
-          //     child: Icon(Icons.edit_rounded,color: CustomColors.whiteColor),
-          //     borderRadius: Design.borderRadius,
-          //     splashColor: CustomColors.whiteColor,
-          //     radius: 30,
-          //     onTap: ()=>_showUpdateAddressDialog(context, size),
-          //   ):Container(),
-          // )
         ],
       ),
     );

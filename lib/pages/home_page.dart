@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.center,
           child: MarqueeWidget(
             text:
-                "২৪ ঘন্টা সার্ভিস পেতে ০১৮২৩৪৮১২৩ নাম্বারে কল করুন । ${Variables.appTitle} এর সাথে থাকার জন্য ধন্যবাদ ।",
+                "২৪ ঘন্টা সার্ভিস পেতে ০১৮৮১০৩৮০০১ নাম্বারে কল করুন । ${Variables.appLongTitle} এর সাথে থাকার জন্য ধন্যবাদ ।",
             textStyle: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: size.width * .05),

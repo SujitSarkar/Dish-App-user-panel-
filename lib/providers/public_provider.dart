@@ -196,6 +196,7 @@ class PublicProvider extends ChangeNotifier{
        'billingNumber': billingNumber,
        'transactionId': transactionId,
         'amount':amount,
+        'payDate': '${DateTime.now().month}/${DateTime.now().year}',
        'state': 'pending',
        'timeStamp': timeStamp.toString()
       }).then((value)async{
